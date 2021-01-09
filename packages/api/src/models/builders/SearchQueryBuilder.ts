@@ -56,6 +56,12 @@ export class SearchQueryBuilder {
 		return this
 	}
 
+	custom(key: string, value: ParamType): SearchQueryBuilder {
+		this.queryParams = { ...this.queryParams, [`${key}`]: value }
+		return this
+	}
+
+
 	build(): string {
 		return buildQueryString(this.queryParams)
 	}

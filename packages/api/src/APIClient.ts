@@ -5,7 +5,7 @@ import { Logger } from 'winston'
 import _logger from './logger'
 import APIClientError from './models/Error'
 
-import { Client, Error, Expense, Invoice, Item, Pagination, Payment, TimeEntry, User } from './models'
+import { Client, Error, Expense, Invoice, Item, Pagination, Payment, TimeEntry, User, JournalEntryAccount, JournalEntryDetail, GeneralLedger, TrialBalance, AccountsAging, Bill } from './models'
 import { transformClientResponse, transformClientListResponse, transformClientRequest } from './models/Client'
 import { transformListInvoicesResponse, transformInvoiceResponse, transformInvoiceRequest } from './models/Invoices'
 import { transformItemResponse, transformItemListResponse, transformItemRequest } from './models/Item'
@@ -23,6 +23,34 @@ import {
 	transformTimeEntryListResponse,
 	transformTimeEntryRequest,
 } from './models/TimeEntry'
+
+import { 
+	transformListJournalEntryAccountResponse,
+	transformJournalEntryAccountResponse
+} from './models/journalEntryAccount';
+
+import {
+	transformListJournalEntryDetailResponse,
+} from './models/journalEntryDetails'
+
+import {
+    transformListGeneralLedgerResponse
+} from './models/JournalLedger'
+
+import {
+	transformListTrialBalanceResponse
+} from './models/trialBalance'
+
+import {
+	transformAccountsAgingResponse,
+    transformListAccountsAgingResponse
+} from './models/AccountsAging'
+
+import {
+    transformListBillsResponse
+} from './models/Bill';
+
+
 import { transformUserResponse } from './models/User'
 
 // defaults
@@ -273,6 +301,142 @@ export default class APIClient {
 				'Delete Invoice'
 			),
 	}
+
+
+
+	public readonly journalEntryAccounts = {
+		/**
+		 * Get list of journal Account Entries
+		 */
+		list: (
+			accountId: string,
+			queryBuilders?: QueryBuilderType[]
+		): Promise<Result<{ journalEntryAccounts: JournalEntryAccount[]; pages: Pagination }>> =>
+			this.call(
+				'GET',
+				`/accounting/account/${accountId}/journal_entry_accounts/journal_entry_accounts${joinQueries(queryBuilders)}`,
+				{
+					transformResponse: transformListJournalEntryAccountResponse,
+				},
+				null,
+				'List Journal Entry Accounts'
+			),
+	}
+
+
+	public readonly journalEntryDetails = {
+		/**
+		 * Get list of journal Account Entries
+		 */
+		list: (
+			accountId: string,
+			queryBuilders?: QueryBuilderType[]
+		): Promise<Result<{ journalEntryDetails: JournalEntryDetail[]; pages: Pagination }>> =>
+		    {
+				return this.call(
+					'GET',
+					`/accounting/account/${accountId}/journal_entries/journal_entry_details${joinQueries(queryBuilders)}`,
+					{
+						transformResponse: transformListJournalEntryDetailResponse,
+					},
+					null,
+					'List Journal Entry Details'
+				)
+		 }
+
+	}
+
+
+	public readonly generalLedger = {
+		/**
+		 * Get list of journal Account Entries
+		 */
+		list: (
+			accountId: string,
+			queryBuilders?: QueryBuilderType[]
+		): Promise<Result<{ generalLedger: GeneralLedger; }>> =>
+		 {
+			console.log(joinQueries(queryBuilders))
+			return this.call(
+				'GET',
+				`/accounting/account/${accountId}/reports/accounting/general_ledger${joinQueries(queryBuilders)}`,
+				{
+					transformResponse: transformListGeneralLedgerResponse,
+				},
+				null,
+				'General Ledger'
+			)
+		 }
+	}
+
+
+	public readonly bills = {
+		/**
+		 * Get list of journal Account Entries
+		 */
+		list: (
+			accountId: string,
+			queryBuilders?: QueryBuilderType[]
+		): Promise<Result<{ bills: Bill[]; pages: Pagination }>> =>
+			this.call(
+				'GET',
+				`/accounting/account/${accountId}/bills/bills${joinQueries(queryBuilders)}`,
+				{
+					transformResponse: transformListBillsResponse,
+				},
+				null,
+				'List Bills'
+			),
+
+	}
+
+
+	public readonly trialBalance = {
+		/**
+		 * Get list of trial balance
+		 */
+		list: (
+			accountId: string,
+			queryBuilders?: QueryBuilderType[]
+		): Promise<Result<{ trialBalance: TrialBalance; }>> =>
+		 {
+			console.log(joinQueries(queryBuilders))
+			return this.call(
+				'GET',
+				`/accounting/account/${accountId}/reports/accounting/trial_balance${joinQueries(queryBuilders)}`,
+				{
+					transformResponse: transformListTrialBalanceResponse,
+				},
+				null,
+				'Trial Balance'
+			)
+		 }
+
+	}
+
+	public readonly agingReport = {
+		/**
+		 * Get list of trial balance
+		 */
+		list: (
+			accountId: string,
+			queryBuilders?: QueryBuilderType[]
+		): Promise<Result<{ accountsAging: AccountsAging; }>> =>
+		 {
+			console.log(joinQueries(queryBuilders))
+			return this.call(
+				'GET',
+				`/accounting/account/${accountId}/reports/accounting/accounts_aging${joinQueries(queryBuilders)}`,
+				{
+					transformResponse: transformListAccountsAgingResponse,
+				},
+				null,
+				'Accounts Aging Report'
+			)
+		 }
+
+	}
+
 
 	public readonly expenses = {
 		single: (accountId: string, expenseId: string, queryBuilders?: QueryBuilderType[]): Promise<Result<Expense>> =>
